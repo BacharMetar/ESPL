@@ -15,3 +15,4 @@ _sum:
     add esp, 4 			; Restore caller state
     pop ebp 			; Restore caller state
     ret
+    //checkchejc
