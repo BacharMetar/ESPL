@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 
 void increas(int length, int *i)
 {
@@ -11,14 +11,34 @@ void increas(int length, int *i)
         *i = 0;
     }
 }
-
 int main(int argc, char *argv[])
 {
+    int debugMode = 1;
     FILE *output = stdout;
 
     int encodingMode = 0;     // 0  for no encoding , 1  for addition , -1 for subtraction  ;
     char *encodingKey = NULL; // an array of chars storing the encodingkey (cell by cell)
 
+
+//================Task1===================================================================
+    for (int i = 1; i < argc; i++)
+    {
+        if (debugMode)
+        {
+            fprintf(stderr, "%s\n", argv[i]);
+        }
+        if (strcmp(argv[i], "-D") == 0)
+        {
+            debugMode = 0;
+        }
+        else  if (strcmp(argv[i], "+D") == 0)
+        {
+            debugMode = 1;
+        }
+    }
+
+
+//================Task2===================================================================
     for (int i = 1; i < argc; ++i)
     {
         // checking what kind of operation (if at all needs)
@@ -99,7 +119,7 @@ int main(int argc, char *argv[])
     // fprintf(output, "i: %d\n", i);
     increas(length, &i);
 
-      fprintf(output, "%c\n", input) ;
+      fprintf(output, "%c", input) ;
 
 
         if (output != stdout)
