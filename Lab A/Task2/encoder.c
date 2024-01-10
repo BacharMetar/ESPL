@@ -1,63 +1,113 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(int argc, char *argv[]) {
-    int encodingMode = 1;  // Example: 1 for addition, -1 for subtraction
-    int encodingKey = 0;   // Initialize encoding key
+#include <stdio.h>
+#include <string.h>
 
-    // Check for encoding flag and key in command-line arguments
-    for (int i = 1; i < argc; ++i) {
-        if (argv[i][0] == '+' && argv[i][1] == 'E') {
+void increas(int length, int *i)
+{
+   
+    (*i)++;
+    if (*i >= length)
+    {
+        *i = 0;
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    FILE *output = stdout;
+
+    int encodingMode = 0;     // 0  for no encoding , 1  for addition , -1 for subtraction  ;
+    char *encodingKey = NULL; // an array of chars storing the encodingkey (cell by cell)
+
+    for (int i = 1; i < argc; ++i)
+    {
+        // checking what kind of operation (if at all needs)
+        if (argv[i][0] == '+' && argv[i][1] == 'E')
+        {
             encodingMode = 1;
-            encodingKey = atoi(argv[i] + 2);
-        } else if (argv[i][0] == '-' && argv[i][1] == 'E') {
+            encodingKey = argv[i] + 2;
+        }
+        else if (argv[i][0] == '-' && argv[i][1] == 'E')
+        {
             encodingMode = -1;
-            encodingKey = atoi(argv[i] + 2);
+            encodingKey = argv[i] + 2;
         }
     }
 
-    printf("Encoding Key: %d\n", encodingKey);
-
-    int c;
-    while ((c = fgetc(stdin)) != EOF) {
-        printf("Original char: %c\n", c);
+    int input;
+    int i = 0;
+    int length = strlen(encodingKey);
+    while ((input = fgetc(stdin)) != EOF)
+    {
+    //    fprintf(output,"Original char: %c\n", input);
 
         // Apply encoding only to uppercase letters and digits
-        if ((c >= 'A' && c <= 'Z')) {
-            if (encodingMode == 1) {
-                int check = c + encodingKey;
-                if (check <= 'Z') {
-                    c = check;
-                } else {
-                    c = 'A' + (check - 'Z' - 1);
+        if ((input >= 'A' && input <= 'Z'))
+        {
+            if (encodingMode == 1)
+            {
+                int check = input + (encodingKey[i] - '0');
+                if (check <= 'Z')
+                {
+                    input = check;
                 }
-            } else if (encodingMode == -1) {
-                int check = c - encodingKey;
-                if (check >= 'A') {
-                    c = check;
-                } else {
-                    c = 'Z' - ('A' - check - 1);
+                else
+                {
+                    input = 'A' + (check - 'Z' - 1);
                 }
             }
-        } else if (c >= '0' && c <= '9') {
-            if (encodingMode == 1) {
-                int check = c + encodingKey;
-                if (check <= '9') {
-                    c = check;
-                } else {
-                    c = '0' + (check - '9' - 1);
+            else if (encodingMode == -1)
+            {
+                int check = input - (encodingKey[i] - '0');
+                if (check >= 'A')
+                {
+                    input = check;
                 }
-            } else if (encodingMode == -1) {
-                int check = c - encodingKey;
-                if (check >= '0') {
-                    c = check;
-                } else {
-                    c = '9' - ('0' - check - 1);
+                else
+                {
+                    input = 'Z' - ('A' - check - 1);
                 }
             }
         }
+        else if (input >= '0' && input <= '9')
+        {
+            if (encodingMode == 1)
+            {
+                int check = input + (encodingKey[i] - '0');
+                if (check <= '9')
+                {
+                    input = check;
+                }
+                else
+                {
+                    input = '0' + (check - '9' - 1);
+                }
+            }
+            else if (encodingMode == -1)
+            {
+                int check = input - (encodingKey[i] - '0');
+                if (check >= '0')
+                {
+                    input = check;
+                }
+                else
+                {
+                    input = '9' - ('0' - check - 1);
+                }
+            }
+        }
+    // fprintf(output, "i: %d\n", i);
+    increas(length, &i);
 
-        printf("Encoded char: %c\n", c);
+      fprintf(output, "%c\n", input) ;
+
+
+        if (output != stdout)
+        {
+            fclose(output);
+        }
     }
 
     return 0;
