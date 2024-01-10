@@ -119,7 +119,8 @@ int main(int argc, char *argv[])
     // fprintf(output, "i: %d\n", i);
     increas(length, &i);
 
-      fprintf(output, "%c", input) ;
+    //   fprintf(output, "%c", input) ;
+        fputc(input, output);
 
 
         if (output != stdout)
