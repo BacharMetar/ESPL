@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
     // fprintf(output, "i: %d\n", i);
     increas(length, &i);
 
-      fprintf(output, "%c\n", input) ;
+      fprintf(output, "%c", input) ;
 
 
         if (output != stdout)
