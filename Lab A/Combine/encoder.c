@@ -5,16 +5,16 @@
 int main(int argc, char *argv[])
 {
     int debugMode = 1;
-    FILE *output = stdout;
-    FILE *input = stdin;
-
+    FILE *output = stdout; //defult output 
+    FILE *input = stdin;    //defult input
     int encodingMode = 0;     // 0  for no encoding , 1  for addition , -1 for subtraction  ;
     char *encodingKey = NULL; // an array of chars storing the encodingkey (cell by cell)
     int inputChar;
     int i = 0;
-    int length = 0;
+    int length = 0; //track with the cycle of +/-E***
 
     //================Task1===================================================================
+    //Debug mode operation
     for (int i = 1; i < argc; i++)
     {
         if (debugMode)
@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
     }
 
     //================Task2===================================================================
+    //check for + or - E and gets the length of it
     for (int i = 1; i < argc; ++i)
     {
         // checking what kind of operation (if at all needs)
@@ -58,9 +59,7 @@ int main(int argc, char *argv[])
     }
 
     // ================================ Task 3 ===================================
-    // Check for input file option
-    // Open input file
-    // Open input file
+    // Check for input/output file option
     for (int i = 1; i < argc; ++i)
     {
         if (strncmp(argv[i], "-I", 2) == 0)
@@ -68,14 +67,14 @@ int main(int argc, char *argv[])
             input = fopen(argv[i] + 2, "r");
             if (!input)
             {
-                fprintf(stderr, "Error opening input file: %s\n", argv[i + 1]);
-                exit(EXIT_FAILURE);
+                fprintf(stderr, "Error opening input file: \n");
+                exit(0); // got idea from https://www.tutorialspoint.com/c_standard_library/c_function_exit.htm
             }
             break;
         }
     }
 
-    // Open output file
+  
     for (int i = 1; i < argc; ++i)
     {
         if (strncmp(argv[i], "-O", 2) == 0)
@@ -83,15 +82,15 @@ int main(int argc, char *argv[])
             output = fopen(argv[i] + 2, "w");
             if (!output)
             {
-                fprintf(stderr, "Error opening output file: %s\n", argv[i + 1]);
-                exit(EXIT_FAILURE);
+                fprintf(stderr, "Error opening output file: \n");
+                exit(0); // got idea from https://www.tutorialspoint.com/c_standard_library/c_function_exit.htm
             }
             break;
         }
     }
 
     //====================end============================================================
-
+    //get the input from stdin / input text
     while ((inputChar = fgetc(input)) != EOF)
     {
         // Apply encoding only to uppercase letters and digits
@@ -156,14 +155,15 @@ int main(int argc, char *argv[])
     }
 
     fputc('\n', output);
-    if (input != stdin && input != NULL)
-    {
-        fclose(input);
-    }
-    if (output != stdout && output != NULL)
-    {
-        fclose(output);
-    }
+
+    // if (input != stdin && input != NULL)
+    // {
+    //     fclose(input);
+    // }
+    // if (output != stdout && output != NULL)
+    // {
+    //     fclose(output);
+    // }
 
     return 0;
 }
