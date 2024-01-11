@@ -2,14 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-void increase(int length, int *i)
-{
-    (*i)++;
-    if (*i >= length)
-    {
-        *i = 0;
-    }
-}
 int main(int argc, char *argv[])
 {
     int debugMode = 1;
@@ -18,6 +10,9 @@ int main(int argc, char *argv[])
 
     int encodingMode = 0;     // 0  for no encoding , 1  for addition , -1 for subtraction  ;
     char *encodingKey = NULL; // an array of chars storing the encodingkey (cell by cell)
+    int inputChar;
+    int i = 0;
+    int length = 0;
 
     //================Task1===================================================================
     for (int i = 1; i < argc; i++)
@@ -44,21 +39,22 @@ int main(int argc, char *argv[])
         {
             encodingMode = 1;
             encodingKey = argv[i] + 2;
+            while (argv[i][2 + length] != '\0')
+            {
+                length++;
+            }
+            // fprintf(stdout, "%d\n", length);
         }
         else if (argv[i][0] == '-' && argv[i][1] == 'E')
         {
             encodingMode = -1;
             encodingKey = argv[i] + 2;
+            while (argv[i][2 + length] != '\0')
+            {
+                length++;
+            }
+            // fprintf(stdout, "%d\n", length);
         }
-    }
-
-    int inputChar;
-    int i = 0;
-    int length = 0;
-    while (argv[1][2 + length] != '\0')
-    {
-        // fprintf(output, "%c", argv[1][2 + length]);
-        length++;
     }
 
     // ================================ Task 3 ===================================
@@ -98,18 +94,11 @@ int main(int argc, char *argv[])
 
     while ((inputChar = fgetc(input)) != EOF)
     {
-        // fprintf(output,"MESSAGE %c\n", "got inside while loop");
-        // fprintf(output, "Inside txt: %c\n", inputChar);
-
         // Apply encoding only to uppercase letters and digits
         if ((inputChar >= 'A' && inputChar <= 'Z'))
         {
-
-            // fprintf(output, "%c\n", encodingKey[i]);
-
             if (encodingMode == 1)
             {
-
                 int check = inputChar + (encodingKey[i] - '0');
                 if (check <= 'Z')
                 {
