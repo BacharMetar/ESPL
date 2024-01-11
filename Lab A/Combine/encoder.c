@@ -64,34 +64,33 @@ int main(int argc, char *argv[])
     // ================================ Task 3 ===================================
     // Check for input file option
     // Open input file
-    for (int i = 1; i < argc - 1; ++i)
+    // Open input file
+    for (int i = 1; i < argc; ++i)
     {
-        if (strcmp(argv[i], "-I") == 0)
+        if (strncmp(argv[i], "-I", 2) == 0)
         {
-            // Open input file
-            input = fopen(argv[i + 1], "r");
+            input = fopen(argv[i] + 2, "r");
             if (!input)
             {
                 fprintf(stderr, "Error opening input file: %s\n", argv[i + 1]);
                 exit(EXIT_FAILURE);
             }
-            break; // Only one input file option is allowed
+            break;
         }
     }
 
     // Open output file
     for (int i = 1; i < argc; ++i)
     {
-        if (strcmp(argv[i], "-O") == 0)
+        if (strncmp(argv[i], "-O", 2) == 0)
         {
-            // Open output file
-            output = fopen(argv[i + 1], "w");
+            output = fopen(argv[i] + 2, "w");
             if (!output)
             {
                 fprintf(stderr, "Error opening output file: %s\n", argv[i + 1]);
                 exit(EXIT_FAILURE);
             }
-            break; // Only one output file option is allowed
+            break;
         }
     }
 
@@ -161,12 +160,12 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        // fprintf(output, "i: %d\n", i);
-        increase(length, &i);
-
-        //   fprintf(output, "%c", inputChar) ;
+        // Increment index
+        i = (i + 1) % length;
+        // print char
         fputc(inputChar, output);
     }
+
     fputc('\n', output);
     if (input != stdin && input != NULL)
     {
