@@ -1,0 +1,2 @@
+gdb count
+break 12 // creating breaking point to the place it fails

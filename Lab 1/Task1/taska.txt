@@ -1,0 +1,59 @@
+In summary, the code segment holds the executable instructions,
+the data segment stores global and static data,
+the stack manages local variables and function call information during program execution.
+Each plays a crucial role in organizing and managing different types of data within a program's memory.
+ 
+0xfff.... --> stored on the stack
+
+0x565.... --> stored on the code segment 
+
+
+
+
+
+
+
+Code Segment:
+------------------
+foo: 0x5659d22d
+
+Data Segment:
+------------------
+argv: 0xff97bec4
+&addr5: 0x565a001c
+&addr6: 0x565a0018
+yos: 0x5659e008
+gg: 0x565a0008
+addr0: 0x565a000c
+addr1: 0x565a0014
+
+Stack:
+------------------
+&argc: 0xff97be30
+&argv: 0xff97be34
+&addr2: 0xff97bdb0
+&addr3: 0xff97bdb4
+&addr4: 0xff97bdb8
+&foo1: 0x5659d5dd
+&foo1: 0x5659d60c
+
+
+Check long data size on your machine using sizeof operator. 
+Is long integer data type enough for dist (address difference) variables ?
+-------------------------------------------------------------------------
+In practical terms, the size of long might be sufficient for representing address differences on some systems, 
+especially in 32-bit architectures where long and pointers might have the same size.
+However, on modern 64-bit architectures, where pointers are usually 64 bits, 
+using long might not be large enough to represent the full range of possible address differences.
+
+For better compatibility and to ensure that you can represent the full address space, 
+it's often more appropriate to use the size_t data type, 
+which is specifically designed to hold sizes and addresses.
+You can obtain the size of size_t using the sizeof operator as well.
+
+
+
+Task1c:
+addr6 is a static variable, so it is allocated in the data segment.
+local is a local variable, so it is allocated on the stack.
+foo is a function, and its address represents the code segment.
