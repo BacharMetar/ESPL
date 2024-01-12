@@ -26,8 +26,8 @@ int secondary(int x)
     char carray[3];
     int iarray2[] = {1, 2, 3};
     char carray2[] = {'a', 'b', 'c'};
-    int *iarray2Ptr;
-    char *carray2Ptr;
+    int *iarray2Ptr = iarray2;
+    char *carray2Ptr = carray2Ptr;
 
     printf("- &addr2: %p\n", &addr2);
     printf("- &addr3: %p\n", &addr3);
@@ -53,23 +53,38 @@ int secondary(int x)
 
     /* task 1 b here */
     // Print hexadecimal values of pointers
-    printf("iarray: %p\n", (void*)iarray);
-    printf("iarray+1: %p\n", (void*)(iarray + 1));
-    
-    printf("farray: %p\n", (void*)farray);
-    printf("farray+1: %p\n", (void*)(farray + 1));
-    
-    printf("darray: %p\n", (void*)darray);
-    printf("darray+1: %p\n", (void*)(darray + 1));
-    
-    printf("carray: %p\n", (void*)carray);
-    printf("carray+1: %p\n", (void*)(carray + 1));
+    printf("iarray: %p\n", (void *)iarray);
+    printf("iarray+1: %p\n", (void *)(iarray + 1));
 
+    printf("farray: %p\n", (void *)farray);
+    printf("farray+1: %p\n", (void *)(farray + 1));
 
+    printf("darray: %p\n", (void *)darray);
+    printf("darray+1: %p\n", (void *)(darray + 1));
+
+    printf("carray: %p\n", (void *)carray);
+    printf("carray+1: %p\n", (void *)(carray + 1));
 
     printf("Pointers and arrays (T1d): ");
 
-    /* task 1 d here */
+    // /* task 1 d here */
+    printf("Task1d start here: \n");
+
+    for (int i = 0; i < 3; i++)
+    {
+        printf("%d", *iarray2Ptr);
+        iarray2Ptr = iarray2Ptr + 1;
+    }
+    printf("\n");
+    for (int i = 0; i < 3; i++)
+    {
+        printf("%d", *carray2Ptr);
+        carray2Ptr = carray2Ptr + 1;
+    }
+     int *p ;
+    printf("%d \n", *p);
+
+    printf("Task1d end here: \n");
 }
 
 int main(int argc, char **argv)
@@ -85,7 +100,16 @@ int main(int argc, char **argv)
 
     printf("Command line arg addresses (T1e):\n");
     /* task 1 e here */
+     printf("Print function argument addresses:\n");
 
+   // Print the address and content of each command-line argument
+    for (int i = 1; i < argc; i++) {
+        printf("Argument %d: Address=%p, Content=%s\n", i, argv[i], argv[i]);
+    }
+
+    
+
+   
     return 0;
 }
 
@@ -103,9 +127,7 @@ void point_at(void *p)
     printf("- dist2: (size_t)&local - (size_t)p: %ld\n", dist2);
     printf("- dist3: (size_t)&foo - (size_t)p:  %ld\n", dist3);
 
-
-    
-     /* part of task 1 a here */
+    /* part of task 1 a here */
     //==============Task1a==========================================================
     printf("Check long type mem size (T1a):\n");
     printf("TASK1A !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n");

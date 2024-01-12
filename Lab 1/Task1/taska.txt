@@ -57,3 +57,13 @@ Task1c:
 addr6 is a static variable, so it is allocated in the data segment.
 local is a local variable, so it is allocated on the stack.
 foo is a function, and its address represents the code segment.
+
+task1e:
+The addresses (0xffebd2c8 and 0xffebd2ce) represent the memory locations where the command-line arguments are stored.
+The content of each argument ("hello" and "make") is stored at these respective memory locations.
+In general, the addresses are typically on the stack, indicating that the command-line arguments are passed to the main() function and stored in the stack memory. The specific addresses may vary each time you run the program.
+
+
+
+
+
