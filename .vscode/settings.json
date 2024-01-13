@@ -1,7 +1,8 @@
 {
     "peacock.remoteColor": "#007fff",
     "files.associations": {
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "stdlib.h": "c"
     },
     "workbench.colorCustomizations": {
         "activityBar.activeBackground": "#3399ff",
