@@ -1,11 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void displayMenu()
-{
-    printf("Select operation from the following menu:\n");
-    // Add more menu items if needed
-}
 // functions declerations:
 char *map(char *array, int array_length, char (*f)(char));
 char my_get(char c);
@@ -13,6 +8,9 @@ char cprt(char c);
 char encrypt(char c);
 char decrypt(char c);
 char xprt(char c);
+
+// functions from task2
+//-------------------------------------------------------------------------------------------------
 
 char *map(char *array, int array_length, char (*f)(char))
 {
@@ -63,12 +61,13 @@ char encrypt(char c)
         return c;
     }
 }
-// https://log2base2.com/c-questions/io/how-to-print-hexadecimal-in-c.html -idea to print hexdecimal in C
+
 
 char xprt(char c)
 {
     // Print the single hexadecimal digit of c followed by a new line
-    printf("%x\n", c);
+    // https://log2base2.com/c-questions/io/how-to-print-hexadecimal-in-c.html -idea to print hexdecimal in C
+    printf("%x\n", c);         
 
     // Return c unchanged
     return c;
@@ -95,12 +94,13 @@ struct fun_desc
     char (*fun)(char);
 };
 
+//----------------------------------------------------------------------------------------------------------
+
 int main(int argc, char **argv)
 {
-
     // Step 1: Define a pointer 'carray' to a char array of length 5, initialized to an empty string
     char charArray[5];
-    charArray[0] = '\0';
+    charArray[0] = '\0'; //initials the array
     char *carray = charArray;
 
     // Step 2: Define an array of fun_desc and initialize it
@@ -110,11 +110,11 @@ int main(int argc, char **argv)
         {"Encrypt", encrypt},
         {"Decrypt", decrypt},
         {"Print Hex", xprt},
-        {NULL, NULL} // Sentinel to mark the end of the menu
+        {NULL, NULL} // mark the end of the menu
     };
 
     // Pre-compute the bounds for user input
-    int menuSize = sizeof(menu) / sizeof(menu[0]) - 1; // Excluding the sentinel
+    int menuSize = sizeof(menu) / sizeof(menu[0]) - 1; // Excluding the NULL element
     int minChoice = 0;
     int maxChoice = menuSize - 1;
 
@@ -122,11 +122,12 @@ int main(int argc, char **argv)
     {
         // Step 3: Display the menu
         printf("Select operation from the following menu:\n");
+
         for (int i = 0; menu[i].name != NULL; ++i)
         {
             printf("%d)  %s\n", i, menu[i].name);
         }
-        // Step 4: Display a prompt and read the user's choice
+        // Step 4: Displays a prompt asking the user to choose a function by its number
         printf("Enter your choice: ");
         char input[100];
         if (fgets(input, sizeof(input), stdin) == NULL)
@@ -138,21 +139,22 @@ int main(int argc, char **argv)
         // Convert input to integer
         int choice = atoi(input);
 
-        // Check if the choice is within the valid range
-        // Step 5: Check if the choice is within bounds
+        //Check if the choice is within bounds
         if (choice >= minChoice && choice <= maxChoice)
         {
             printf("Within bounds\n");
 
-            // Step 6: Evaluate the appropriate function over 'carray'
+            // Step 5: Evaluate the appropriate function over 'carray' +
+            // Step 6: After calling any menu function, let 'carray' point to the new array returned by map( )
             carray = map(carray, 5, menu[choice].fun);
 
-            // Step 7: After calling any menu function, let 'carray' point to the new array returned by map( )
+            
             printf("Function result: %s\n", carray);
         }
         else
         {
-            printf("Not within bounds. Try again.\n");
+            printf("Not within bounds. Program terminated.\n");
+            exit(0);
         }
     }
 
