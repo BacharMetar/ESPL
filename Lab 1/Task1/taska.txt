@@ -9,7 +9,8 @@ Each plays a crucial role in organizing and managing different types of data wit
 
 
 
-
+task 1b:
+In a downward-growing stack, addresses decrease as you move "up" the stack
 
 
 
