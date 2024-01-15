@@ -37,19 +37,16 @@ char *map(char *array, int array_length, char (*f)(char))
     char *mapped_array = (char *)(malloc(array_length * sizeof(char)));
     /* TODO: Complete during task 2.a */
     int i;
-
     for (i = 0; i < array_length; ++i)
     {
         mapped_array[i] = f(array[i]);
-
         // Check for newline character
         if (mapped_array[i] == '\n')
         {
             break;
         }
     }
-
-    // If the Enter key is encountered, add a null terminator to the mapped_array
+    // If the Enter key is encountered with string shorter then 4, add a null terminator to the mapped_array
     if (i < array_length)
     {
         mapped_array[i] = '\0';
