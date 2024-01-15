@@ -13,25 +13,6 @@ char xprt(char c);
 // functions from task2
 //-------------------------------------------------------------------------------------------------
 
-// char *map(char *array, int array_length, char (*f)(char))
-// {
-//     char *mapped_array = (char *)(malloc(array_length * sizeof(char)));
-//     /* TODO: Complete during task 2.a */
-//     for (int i = 0; i < array_length; ++i)
-//     {
-//         if (f(array[i]) == '\n')
-//         {
-//             mapped_array[i] = f(array[i]);
-//             return mapped_array;
-//         }
-//         else
-//         {
-//             mapped_array[i] = f(array[i]);
-//         }
-//     }
-//     return mapped_array;
-// }
-
 char *map(char *array, int array_length, char (*f)(char))
 {
     char *mapped_array = (char *)(malloc(array_length * sizeof(char)));
@@ -54,7 +35,6 @@ char *map(char *array, int array_length, char (*f)(char))
 
     return mapped_array;
 }
-
 
 char nextChar(char c)
 {
@@ -176,14 +156,6 @@ int main(int argc, char **argv)
         if (choice >= minChoice && choice <= maxChoice)
         {
             printf("Within bounds\n");
-            // if (choice == 0)
-            // {
-            //     // If the choice is 0, get the length dynamically from the function
-            //     char (*in)(char) = menu[choice].fun;
-            //     length = sizeof(*in);
-            //     // printf("%d", length);
-            //      carray = map(carray, length, in);
-            // }
             // // Step 5: Evaluate the appropriate function over 'carray' +
             // Step 6: After calling any menu function, let 'carray' point to the new array returned by map( )
 
