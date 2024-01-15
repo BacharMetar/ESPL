@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // functions declerations:
 char *map(char *array, int array_length, char (*f)(char));
@@ -12,16 +13,51 @@ char xprt(char c);
 // functions from task2
 //-------------------------------------------------------------------------------------------------
 
+// char *map(char *array, int array_length, char (*f)(char))
+// {
+//     char *mapped_array = (char *)(malloc(array_length * sizeof(char)));
+//     /* TODO: Complete during task 2.a */
+//     for (int i = 0; i < array_length; ++i)
+//     {
+//         if (f(array[i]) == '\n')
+//         {
+//             mapped_array[i] = f(array[i]);
+//             return mapped_array;
+//         }
+//         else
+//         {
+//             mapped_array[i] = f(array[i]);
+//         }
+//     }
+//     return mapped_array;
+// }
+
 char *map(char *array, int array_length, char (*f)(char))
 {
     char *mapped_array = (char *)(malloc(array_length * sizeof(char)));
     /* TODO: Complete during task 2.a */
-    for (int i = 0; i < array_length; ++i)
+    int i;
+
+    for (i = 0; i < array_length; ++i)
     {
         mapped_array[i] = f(array[i]);
+
+        // Check for newline character
+        if (mapped_array[i] == '\n')
+        {
+            break;
+        }
     }
+
+    // If the Enter key is encountered, add a null terminator to the mapped_array
+    if (i < array_length)
+    {
+        mapped_array[i] = '\0';
+    }
+
     return mapped_array;
 }
+
 
 char nextChar(char c)
 {
@@ -62,12 +98,11 @@ char encrypt(char c)
     }
 }
 
-
 char xprt(char c)
 {
     // Print the single hexadecimal digit of c followed by a new line
     // https://log2base2.com/c-questions/io/how-to-print-hexadecimal-in-c.html -idea to print hexdecimal in C
-    printf("%x\n", c);         
+    printf("%x\n", c);
 
     // Return c unchanged
     return c;
@@ -100,7 +135,7 @@ int main(int argc, char **argv)
 {
     // Step 1: Define a pointer 'carray' to a char array of length 5, initialized to an empty string
     char charArray[5];
-    charArray[0] = '\0'; //initials the array
+    charArray[0] = '\0'; // initials the array
     char *carray = charArray;
 
     // Step 2: Define an array of fun_desc and initialize it
@@ -117,6 +152,7 @@ int main(int argc, char **argv)
     int menuSize = sizeof(menu) / sizeof(menu[0]) - 1; // Excluding the NULL element
     int minChoice = 0;
     int maxChoice = menuSize - 1;
+    size_t length = 5;
 
     while (1)
     {
@@ -129,7 +165,7 @@ int main(int argc, char **argv)
         }
         // Step 4: Displays a prompt asking the user to choose a function by its number
         printf("Enter your choice: ");
-        char input[100];
+        char input[5];
         if (fgets(input, sizeof(input), stdin) == NULL)
         {
             // Exit the loop if EOF is encountered
@@ -138,17 +174,25 @@ int main(int argc, char **argv)
 
         // Convert input to integer
         int choice = atoi(input);
-
-        //Check if the choice is within bounds
+        // int length = sizeof(charArray);
+        // Check if the choice is within bounds
         if (choice >= minChoice && choice <= maxChoice)
         {
             printf("Within bounds\n");
-
-            // Step 5: Evaluate the appropriate function over 'carray' +
+            // if (choice == 0)
+            // {
+            //     // If the choice is 0, get the length dynamically from the function
+            //     char (*in)(char) = menu[choice].fun;
+            //     length = sizeof(*in);
+            //     // printf("%d", length);
+            //      carray = map(carray, length, in);
+            // }
+            // // Step 5: Evaluate the appropriate function over 'carray' +
             // Step 6: After calling any menu function, let 'carray' point to the new array returned by map( )
-            carray = map(carray, 5, menu[choice].fun);
 
-            
+            carray = map(carray, length, menu[choice].fun);
+            length = sizeof(carray);
+
             printf("Function result: %s\n", carray);
         }
         else
