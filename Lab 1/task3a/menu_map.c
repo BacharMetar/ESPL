@@ -31,6 +31,7 @@ char *map(char *array, int array_length, char (*f)(char))
     if (i < array_length)
     {
         mapped_array[i] = '\0';
+        
     }
 
     return mapped_array;
@@ -160,7 +161,8 @@ int main(int argc, char **argv)
             // Step 6: After calling any menu function, let 'carray' point to the new array returned by map( )
 
             carray = map(carray, length, menu[choice].fun);
-            length = sizeof(carray);
+            // length = sizeof(carray);
+            length = strlen(carray) + 1s;
 
             printf("Function result: %s\n", carray);
         }
