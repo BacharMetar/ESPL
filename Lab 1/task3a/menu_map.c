@@ -162,17 +162,19 @@ int main(int argc, char **argv)
 
             carray = map(carray, length, menu[choice].fun);
             // length = sizeof(carray);
-            length = strlen(carray) + 1;
+            // length = strlen(carray) + 1;
 
             printf("Function result: %s\n", carray);
         }
         else
         {
             printf("Not within bounds. Program terminated.\n");
+            free(carray);
             exit(0);
         }
     }
 
+    free(carray);
     printf("Program terminated.\n");
 
     return 0;
