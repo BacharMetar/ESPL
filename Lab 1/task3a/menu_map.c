@@ -162,7 +162,7 @@ int main(int argc, char **argv)
 
             carray = map(carray, length, menu[choice].fun);
             // length = sizeof(carray);
-            length = strlen(carray) + 1s;
+            length = strlen(carray) + 1;
 
             printf("Function result: %s\n", carray);
         }
