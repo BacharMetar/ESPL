@@ -5,8 +5,9 @@
 int main(int argc, char *argv[])
 {
     int debugMode = 1;
-    FILE *output = stdout; //defult output 
+    FILE *output = stdout;//defult output 
     FILE *input = stdin;    //defult input
+
     int encodingMode = 0;     // 0  for no encoding , 1  for addition , -1 for subtraction  ;
     char *encodingKey = NULL; // an array of chars storing the encodingkey (cell by cell)
     int inputChar;
@@ -14,7 +15,7 @@ int main(int argc, char *argv[])
     int length = 0; //track with the cycle of +/-E***
 
     //================Task1===================================================================
-    //Debug mode operation
+        //Debug mode operation
     for (int i = 1; i < argc; i++)
     {
         if (debugMode)
@@ -59,7 +60,9 @@ int main(int argc, char *argv[])
     }
 
     // ================================ Task 3 ===================================
-    // Check for input/output file option
+    // Check for input file option
+    // Open input file
+    // Open input file
     for (int i = 1; i < argc; ++i)
     {
         if (strncmp(argv[i], "-I", 2) == 0)
@@ -67,14 +70,14 @@ int main(int argc, char *argv[])
             input = fopen(argv[i] + 2, "r");
             if (!input)
             {
-                fprintf(stderr, "Error opening input file: \n");
+                fprintf(stderr, "Error opening input file: %s\n", argv[i + 1]);
                 exit(0); // got idea from https://www.tutorialspoint.com/c_standard_library/c_function_exit.htm
             }
             break;
         }
     }
 
-  
+    // Open output file
     for (int i = 1; i < argc; ++i)
     {
         if (strncmp(argv[i], "-O", 2) == 0)
@@ -82,7 +85,7 @@ int main(int argc, char *argv[])
             output = fopen(argv[i] + 2, "w");
             if (!output)
             {
-                fprintf(stderr, "Error opening output file: \n");
+                fprintf(stderr, "Error opening output file: %s\n", argv[i + 1]);
                 exit(0); // got idea from https://www.tutorialspoint.com/c_standard_library/c_function_exit.htm
             }
             break;
@@ -96,58 +99,65 @@ int main(int argc, char *argv[])
         // Apply encoding only to uppercase letters and digits
         if ((inputChar >= 'A' && inputChar <= 'Z'))
         {
-            if (encodingMode == 1)
+            if (encodingKey != NULL)
             {
-                int check = inputChar + (encodingKey[i] - '0');
-                if (check <= 'Z')
+                if (encodingMode == 1)
                 {
-                    inputChar = check;
+                    int check = inputChar + (encodingKey[i] - '0');
+                    if (check <= 'Z')
+                    {
+                        inputChar = check;
+                    }
+                    else
+                    {
+                        inputChar = 'A' + (check - 'Z' - 1);
+                    }
                 }
-                else
+                else if (encodingMode == -1)
                 {
-                    inputChar = 'A' + (check - 'Z' - 1);
-                }
-            }
-            else if (encodingMode == -1)
-            {
-                int check = inputChar - (encodingKey[i] - '0');
-                if (check >= 'A')
-                {
-                    inputChar = check;
-                }
-                else
-                {
-                    inputChar = 'Z' - ('A' - check - 1);
+                    int check = inputChar - (encodingKey[i] - '0');
+                    if (check >= 'A')
+                    {
+                        inputChar = check;
+                    }
+                    else
+                    {
+                        inputChar = 'Z' - ('A' - check - 1);
+                    }
                 }
             }
         }
         else if (inputChar >= '0' && inputChar <= '9')
         {
-            if (encodingMode == 1)
+            if (encodingKey != NULL)
             {
-                int check = inputChar + (encodingKey[i] - '0');
-                if (check <= '9')
+                if (encodingMode == 1)
                 {
-                    inputChar = check;
+                    int check = inputChar + (encodingKey[i] - '0');
+                    if (check <= '9')
+                    {
+                        inputChar = check;
+                    }
+                    else
+                    {
+                        inputChar = '0' + (check - '9' - 1);
+                    }
                 }
-                else
+                else if (encodingMode == -1)
                 {
-                    inputChar = '0' + (check - '9' - 1);
-                }
-            }
-            else if (encodingMode == -1)
-            {
-                int check = inputChar - (encodingKey[i] - '0');
-                if (check >= '0')
-                {
-                    inputChar = check;
-                }
-                else
-                {
-                    inputChar = '9' - ('0' - check - 1);
+                    int check = inputChar - (encodingKey[i] - '0');
+                    if (check >= '0')
+                    {
+                        inputChar = check;
+                    }
+                    else
+                    {
+                        inputChar = '9' - ('0' - check - 1);
+                    }
                 }
             }
         }
+
         // Increment index
         i = (i + 1) % length;
         // print char
@@ -155,15 +165,14 @@ int main(int argc, char *argv[])
     }
 
     fputc('\n', output);
-
-    // if (input != stdin && input != NULL)
-    // {
-    //     fclose(input);
-    // }
-    // if (output != stdout && output != NULL)
-    // {
-    //     fclose(output);
-    // }
+    if (input != stdin && input != NULL)
+    {
+        fclose(input);
+    }
+    if (output != stdout && output != NULL)
+    {
+        fclose(output);
+    }
 
     return 0;
 }
