@@ -17,7 +17,6 @@ int debugMode;
 
 void execute(cmdLine *pCmdLine)
 {
-
     // Handle "cd" command
     if (strcmp(pCmdLine->arguments[0], "cd") == 0)
     {
@@ -34,10 +33,12 @@ void execute(cmdLine *pCmdLine)
             fprintf(stderr, "PID: %d\nExecuting command %s\n", getpid(), pCmdLine->arguments[0]);
         }
     }
+    // Handle "wakeup" command
     else if (strcmp(pCmdLine->arguments[0], "wakeup") == 0)
     {
-        // Extract the process ID from the arguments
+
         int pid = atoi(pCmdLine->arguments[1]);
+
         // Send the SIGCONT signal to wake up the process
         printf("Wakeup: Sending SIGCONT to PID: %d\n", pid);
         if (kill(pid, SIGCONT) == -1)
@@ -46,29 +47,27 @@ void execute(cmdLine *pCmdLine)
         }
         printf("Wakeup: SIGCONT sent to PID: %d\n", pid);
     }
+    // Handle "nuke" command
     else if (strcmp(pCmdLine->arguments[0], "nuke") == 0)
     {
-        // Extract the process ID from the arguments
         int pid = atoi(pCmdLine->arguments[1]);
+
         // Send the SIGKILL signal to terminate the process
         if (kill(pid, SIGKILL) == -1)
         {
             perror("Failed to send SIGKILL");
         }
     }
-
     else
     {
         // Use fork to create a child process
         int pid = fork();
-
         // Check for fork failure
         if (pid == -1)
         {
             perror("fork failure");
             exit(EXIT_FAILURE);
         }
-
         // Parent process
         if (pid > 0)
         {
@@ -102,7 +101,6 @@ void execute(cmdLine *pCmdLine)
                 }
                 close(fd1);
             }
-
             // check if exist any OUTPUT source
             if (pCmdLine->outputRedirect != NULL)
             {
@@ -128,7 +126,6 @@ void execute(cmdLine *pCmdLine)
                 _exit(EXIT_FAILURE);
             }
         }
-
         if (debugMode == 1)
         {
             fprintf(stderr, "PID: %d\nExecuting command %s\n", pid, pCmdLine->arguments[0]);
