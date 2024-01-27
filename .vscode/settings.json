@@ -2,7 +2,8 @@
     "peacock.remoteColor": "#007fff",
     "files.associations": {
         "stdio.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "virusdetector": "c"
     },
     "workbench.colorCustomizations": {
         "activityBar.activeBackground": "#3399ff",
