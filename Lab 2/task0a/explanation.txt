@@ -1,0 +1,26 @@
+fork(2):
+The fork system call creates a new process by duplicating the calling process. After a successful fork, two processes are running: 
+the parent process and the child process.
+The child process is an exact copy of the parent process, except for a few differences, such as the process ID (PID) and the return value of the fork call. 
+In the parent process, fork returns the PID of the child process, while in the child process, it returns 0.
+
+exec(2): and its variants: The exec family of system calls replaces the current process image with a new process image. 
+It loads a new executable file into the current process space, overlaying the existing program. 
+The different variants of exec (such as execl, execv, execle, execve, etc.) allow for different ways to specify the arguments and environment for the new process. 
+After a successful exec call, the new program starts executing, and the code of the original program is no longer in memory.
+
+signal(2): 
+The signal system call allows a process to specify how certain signals (interrupts) from the operating system should be handled. 
+It establishes a signal handler function to be called when a particular signal occurs. 
+Signals can be used for various purposes, such as handling errors, responding to user actions (like pressing Ctrl+C to interrupt), 
+or communicating between processes.
+
+waitpid(2): 
+The waitpid system call suspends the execution of the calling process until a specified child process terminates, or until a signal is received. 
+It allows a parent process to wait for the termination of a specific child process or any child process in a specific process group. 
+The waitpid system call also provides information about the status of the terminated child process.
+
+
+exec vs execvp:
+When you replace execv with execvp, you allow the system to search for the executable in directories specified by the PATH variable, just like execv. 
+However, the primary difference is that execvp also allows you to specify the program name with or without the full path.
