@@ -12,11 +12,11 @@ const int BYTES_FOR_NAME_AND_SIGNATURE_SIZE = 18;
 
 virus* readVirus(FILE* input)
 {
-    virus* new_virus = malloc(sizeof(virus));
+    virus* new_virus = (virus*)malloc(sizeof(virus));
 
     if(fread(new_virus, 1, BYTES_FOR_NAME_AND_SIGNATURE_SIZE, input) > 0)
     {
-        new_virus->signature = malloc(new_virus->signature_size);
+        new_virus->signature = (char*)malloc(new_virus->signature_size);
         fread(new_virus->signature, 1, new_virus->signature_size, input);
         return new_virus;
     }
@@ -86,7 +86,7 @@ void list_print(link *virus_list, FILE* output)
 //---------------
 link* new_link(virus* data)
 {
-    link* output = malloc(sizeof(link));
+    link* output = (link*)malloc(sizeof(link));
     output->vir = data;
     output->nextVirus = NULL;
 
@@ -193,7 +193,7 @@ void detect_virus(char *buffer, unsigned int size, link *virus_list)
                 is_clean = memcmp(buffer + starting_position, current_virus_link->vir->signature, current_virus_link->vir->signature_size);
             }
 
-            if(!is_clean)
+            if(is_clean == 0)
             {
                 printf("starting byte location: %d\n", starting_position);
                 printf("virus name: %s\n", current_virus_link->vir->virus_name);
@@ -227,10 +227,41 @@ link* detect_viruses(link* virus_list, char* file_name)
     return virus_list;
 }
 //---------
-link* fix_file()
+void kill_virus(char *fileName, int signitureOffset, int signitureSize)
 {
-    printf("Not implemented\n");
-    return NULL;
+    FILE* file = fopen(fileName, "r+");
+    
+    if(file == NULL)
+    {
+        printf("cannot open file!\n");
+        exit(0);
+    }
+
+    fseek(file, signitureOffset, SEEK_SET);
+    
+    char buffer[signitureSize];
+    for(int i = 0; i < signitureSize; i++)
+    {
+        buffer[i] = 0;
+    }
+
+    fwrite(buffer, 1, signitureSize, file);
+
+    fclose(file);
+}
+link* fix_file(link* UNUSED1, char* file_name)
+{
+    int signature_offset, signature_size;
+
+    printf("Insert starting byte: ");
+    scanf("%d",&signature_offset);
+
+    printf("Insert signature size: ");
+    scanf("%d",&signature_size);
+
+    kill_virus(file_name, signature_offset, signature_size);
+
+    return UNUSED1;
 }
 //--------
 link* quit()
