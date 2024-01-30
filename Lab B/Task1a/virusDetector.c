@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 typedef struct virus
 {
@@ -36,6 +37,15 @@ virus *readVirus(FILE *input)
 
     return new_virus;
 }
+
+void PrintHex(unsigned char *buffer, size_t length)
+{
+    for (size_t i = 0; i < length; ++i)
+    {
+        fprintf(stdout, "%02X ", buffer[i]);
+    }
+    printf("\n");
+}
 void printVirus(virus *virus, FILE *output)
 {
     // Print virus name
@@ -53,27 +63,6 @@ void printVirus(virus *virus, FILE *output)
     fprintf(output, "\n\n");
 }
 
-// int main(int argc, const char **argv)
-// {
-
-//     FILE *signatures_file = fopen(argv[1], "rb");
-//     if (signatures_file == NULL)
-//     {
-//         perror("Error opening signatures file");
-//         return EXIT_FAILURE;
-//     }
-
-//     virus *current_virus;
-//     while ((current_virus = readVirus(signatures_file)) != NULL)
-//     {
-//         printVirus(current_virus, stdout); // Prints to standard output
-//         free(current_virus->sig);
-//         free(current_virus);
-//     }
-
-//     fclose(signatures_file);
-//     return EXIT_SUCCESS;
-// }
 
 int main(int argc, const char **argv)
 {
@@ -91,10 +80,18 @@ int main(int argc, const char **argv)
         return EXIT_FAILURE;
     }
 
-    // Find the length of the file
-    fseek(input, 0, SEEK_END);
-    long file_size = ftell(input);
-    fseek(input, 0, SEEK_SET);
+    // // Find the length of the file
+    // fseek(input, 0, SEEK_END);
+    // long file_size = ftell(input);
+    // fseek(input, 0, SEEK_SET);
+    struct stat file_stat;
+
+    if (stat(argv[1], &file_stat) == -1) {
+        perror("Error getting file status");
+        return 1;
+    }
+
+    long file_size = file_stat.st_size;
 
     // Read the magic number
     char magic_number[5]; // Including the null terminator

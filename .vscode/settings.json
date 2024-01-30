@@ -3,7 +3,8 @@
     "files.associations": {
         "stdio.h": "c",
         "stdlib.h": "c",
-        "virusdetector": "c"
+        "virusdetector": "c",
+        "typeinfo": "c"
     },
     "workbench.colorCustomizations": {
         "activityBar.activeBackground": "#3399ff",
