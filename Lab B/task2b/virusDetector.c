@@ -299,71 +299,9 @@ link *detect_viruses(link *virus_list, char *file_name)
 // }
 
 // Define a global variable to store the signature size
-// short signitureSize = 0;
+short signitureSize = 0;
 
-// void neutralize_virus(char *fileName, int signatureOffset)
-// {
-//     FILE *file = fopen(fileName, "r+b"); // Open the file for read/write in binary mode
-//     if (file == NULL)
-//     {
-//         perror("Error opening file");
-//         return;
-//     }
-
-//     // Move the file pointer to the location of the virus signature offset
-//     fseek(file, signatureOffset, SEEK_SET);
-
-//     // Write the RET instruction to the first byte of the virus signature
-//     // unsigned char ret_instruction = 0xC3; // RET instruction in x86 assembly
-//     // fwrite(&ret_instruction, sizeof(unsigned char), 1, file);
-
-//     // fclose(file);
-//     char buffer[signitureSize];
-//     for(int i = 0; i < signitureSize; i++)
-//     {
-//         buffer[i] = 0;
-//     }
-
-//     fwrite(buffer, 1, signitureSize, file);
-
-//     fclose(file);
-// }
-
-// link *fix_file(link *virus_list, char *file_name)
-// {
-//     // Open the suspected file
-//     FILE *file = fopen(file_name, "rb");
-//     if (file == NULL)
-//     {
-//         perror("Error opening file");
-//         return virus_list;
-//     }
-//     long startByte = 0; // Initialize the start byte
-
-//     // Iterate through the linked list of viruses
-//     link *current = virus_list;
-//     while (current != NULL)
-//     {
-//         fseek(file, startByte, SEEK_SET);
-//         // Neutralize the virus by calling neutralize_virus function
-//         signitureSize = current->vir->SigSize;
-//         neutralize_virus(file_name, startByte);
-
-//         // Move to the next virus
-//         startByte += current->vir->SigSize;
-
-//         current = current->nextVirus;
-//     }
-
-//     fclose(file);
-//     return virus_list;
-// }
-
-
-// Global variable to store the signature size
-short signatureSize = 0;
-
-void neutralize_virus(char *fileName, int signatureOffset, int signatureSize)
+void neutralize_virus(char *fileName, int signatureOffset)
 {
     FILE *file = fopen(fileName, "r+b"); // Open the file for read/write in binary mode
     if (file == NULL)
@@ -375,24 +313,31 @@ void neutralize_virus(char *fileName, int signatureOffset, int signatureSize)
     // Move the file pointer to the location of the virus signature offset
     fseek(file, signatureOffset, SEEK_SET);
 
-    // Write zeros to neutralize the virus signature
-    for (int i = 0; i < signatureSize; i++)
+    // Write the RET instruction to the first byte of the virus signature
+    // unsigned char ret_instruction = 0xC3; // RET instruction in x86 assembly
+    // fwrite(&ret_instruction, sizeof(unsigned char), 1, file);
+
+    // fclose(file);
+    char buffer[signitureSize];
+    for(int i = 0; i < signitureSize; i++)
     {
-        fputc(0, file); // Write zero byte
+        buffer[i] = 0;
     }
+
+    fwrite(buffer, 1, signitureSize, file);
 
     fclose(file);
 }
 
 link *fix_file(link *virus_list, char *file_name)
 {
-    FILE *file = fopen(file_name, "r+b"); // Open the suspected file for read/write in binary mode
+    // Open the suspected file
+    FILE *file = fopen(file_name, "rb");
     if (file == NULL)
     {
         perror("Error opening file");
         return virus_list;
     }
-
     long startByte = 0; // Initialize the start byte
 
     // Iterate through the linked list of viruses
@@ -400,10 +345,9 @@ link *fix_file(link *virus_list, char *file_name)
     while (current != NULL)
     {
         fseek(file, startByte, SEEK_SET);
-        signatureSize = current->vir->SigSize; // Update the global signatureSize
-
         // Neutralize the virus by calling neutralize_virus function
-        neutralize_virus(file_name, startByte, current->vir->SigSize);
+        signitureSize = current->vir->SigSize;
+        neutralize_virus(file_name, startByte);
 
         // Move to the next virus
         startByte += current->vir->SigSize;
@@ -414,6 +358,9 @@ link *fix_file(link *virus_list, char *file_name)
     fclose(file);
     return virus_list;
 }
+
+
+
 
 
 

@@ -1,75 +1,57 @@
+// #include <linux/limits.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <limits.h> // for PATH_MAX
+#include <unistd.h> //cwd
 #include "LineParser.h"
+#include <string.h>
+#include <stdlib.h>
 
-#define MAX_INPUT_SIZE 2048
-// #define PATH_MAX 2048
+#include <limits.h> // for PATH_MAX
 
-void execute(cmdLine *pCmdLine)
+#define true 1
+#define BUFFER_SIZE 2048
+
+void execute(cmdLine* parsed_cmd_line)
 {
-    // Use execv to replace the current process with the specified program
-    if (execvp(pCmdLine->arguments[0], pCmdLine->arguments) == -1)
+    char* const current_command = parsed_cmd_line->arguments[0];
+    
+    if(strcmp(current_command, "quit") == 0)
     {
-        // execv failed
-        perror("execvp");
-        exit(EXIT_FAILURE);
+        exit(EXIT_SUCCESS);
     }
+
+    if(execv(current_command, parsed_cmd_line->arguments) <  0)
+    {
+        perror("Failure to execute command");
+        exit(EXIT_FAILURE);
+    }    
 }
 
-int main()
+int main(int argc, char const *argv[])
 {
-    char path_name[MAX_INPUT_SIZE];
-    cmdLine *parsedLine;
+    FILE* const input = stdin;
+    FILE* const output = stdout;
 
-    FILE *const input = stdin;
-    FILE *const output = stdout;
+    char path_name_buffer[PATH_MAX];
+    char reading_buffer[BUFFER_SIZE];
 
-    while (1)
+    while (true)
     {
-        // Display prompt
-        char cwd[PATH_MAX];
-        if (getcwd(cwd, sizeof(cwd)) != NULL)
-        {
-            fprintf(output, "%s$ ", cwd);
-        }
-        else
-        {
-            perror("getcwd");
-            exit(EXIT_FAILURE);
-        }
-        // Read path_name
-        if (fgets(path_name, MAX_INPUT_SIZE, input) == NULL)
-        {
-            perror("fgets");
-            exit(EXIT_FAILURE);
-        }
+        //1. print cwd
+        getcwd(path_name_buffer, PATH_MAX);
+        fprintf(output, "%s\n", path_name_buffer);
 
-        // Parse path_name
-        parsedLine = parseCmdLines(path_name);
+        //2. read line from user
+        fgets(reading_buffer, BUFFER_SIZE, input);
 
-        parsedLine = parseCmdLines(path_name);
+        //3. parse the input
+        cmdLine* parsed_cmd_line = parseCmdLines(reading_buffer);
 
-        // Check for "quit" command
-        if (strcmp(parsedLine->arguments[0], "quit") == 0)
-        {
-            fprintf(output, "%s$ ", "Exiting the shell.\n");
-            // Release any remaining resources
-            freeCmdLines(parsedLine);
-            exit(EXIT_SUCCESS);
-        }
+        //4. execute
+        execute(parsed_cmd_line);
 
-        // Execute the parsed command
-        else
-        {
-            execute(parsedLine);
-        }
-        // Release cmdLine resources
-        freeCmdLines(parsedLine);
-    }
+        //6. relase cmd line when finished
+        freeCmdLines(parsed_cmd_line);
+    }    
 
-    printf("Exiting the shell.\n");
     return 0;
 }
