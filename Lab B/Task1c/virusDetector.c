@@ -44,32 +44,6 @@ virus *readVirus(FILE *input)
     return new_virus;
 }
 
-// virus *readVirus(FILE *input)
-// {
-//     virus *new_virus = malloc(sizeof(virus));
-
-//     if (fread(new_virus, 1, 18, input) > 0)
-//     {
-//         new_virus->sig = malloc(new_virus->SigSize);
-//         fread(new_virus->sig, 1, new_virus->SigSize, input);
-//         return new_virus;
-//     }
-
-//     else
-//     {
-//         free(new_virus);
-//         return NULL;
-//     }
-// }
-
-void PrintHex(unsigned char *buffer, size_t length)
-{
-    for (size_t i = 0; i < length; ++i)
-    {
-        fprintf(stdout, "%02X ", buffer[i]);
-    }
-    printf("\n");
-}
 void printVirus(virus *virus, FILE *output)
 {
     // Print virus name
@@ -86,6 +60,7 @@ void printVirus(virus *virus, FILE *output)
     }
     fprintf(output, "\n\n");
 }
+
 void list_print(link *virus_list, FILE *stream)
 {
     if (virus_list == NULL)
@@ -160,18 +135,25 @@ void list_free(link *virus_list)
 }
 
 // Define the function descriptor struct
+// struct fun_desc
+// {
+//     char *name;
+//     link *(*fun)(link *);
+// };
+
 struct fun_desc
 {
     char *name;
-    link *(*fun)(link *);
+    link *(*fun)(link *, char *); // Update the function signature
 };
-// Function prototypes
-link *load_signatures(link *virus_list);
-link *print_signatures(link *virus_list);
-link *detect_viruses(link *virus_list);
-link *fix_file(link *virus_list);
 
-link *load_signatures(link *virus_list)
+// Function prototypes
+link *load_signatures(link *virus_list,char* file_name);
+link *print_signatures(link *virus_list,char* file_name);
+link *detect_viruses(link *virus_list, char* file_name);
+link *fix_file(link *virus_list,char* file_name);
+
+link *load_signatures(link *virus_list,char* file_name)
 {
     const int BUFFER_SIZE = 128;
     char filename[BUFFER_SIZE];
@@ -202,15 +184,6 @@ link *load_signatures(link *virus_list)
         fclose(file);
         exit(EXIT_FAILURE);
     }
-    // magic_number[4] = '\0'; // Null-terminate the string
-
-    // // Check if the magic number is valid
-    // if (strcmp(magic_number, "VIRL") != 0 && strcmp(magic_number, "VIRB") != 0) {
-    //     fprintf(stderr, "Invalid magic number: %s\n", magic_number);
-    //     fclose(file);
-    //     exit(EXIT_FAILURE);
-    // }
-
     // Read viruses from the file and append them to the virus list
     while (ftell(file) < FILE_SIZE)
     {
@@ -229,16 +202,124 @@ link *load_signatures(link *virus_list)
     return virus_list;
 }
 
-link *print_signatures(link *virus_list)
+link *print_signatures(link *virus_list,char* file_name)
 {
     list_print(virus_list, stdout);
     return virus_list;
 }
-link *detect_viruses(link *virus_list)
+// // link *detect_viruses(link *virus_list)
+// // {
+// //     // Prompt the user for the file to scan
+// //     char filename[256];
+// //     printf("Enter the file name to scan for viruses: ");
+// //     fgets(filename, sizeof(filename), stdin);
+// //     filename[strcspn(filename, "\n")] = '\0'; // Remove trailing newline
+
+// //     // Open the file for reading
+// //     FILE *file = fopen(filename, "rb");
+// //     if (file == NULL)
+// //     {
+// //         perror("Error opening file");
+// //         return virus_list;
+// //     }
+
+// //     // Read the content of the file
+// //     fseek(file, 0, SEEK_END);
+// //     long file_size = ftell(file);
+// //     fseek(file, 0, SEEK_SET);
+
+// //     unsigned char *file_content = malloc(file_size);
+// //     if (file_content == NULL)
+// //     {
+// //         perror("Memory allocation failed");
+// //         fclose(file);
+// //         return virus_list;
+// //     }
+
+// //     fread(file_content, 1, file_size, file);
+// //     fclose(file);
+
+// //     // Traverse through the virus list and compare with file content
+// //     int virus_count = 0;
+// //     link *current = virus_list;
+// //     while (current != NULL)
+// //     {
+// //         virus *current_virus = current->vir;
+// //         for (int i = 0; i <= file_size - current_virus->SigSize; i++)
+// //         {
+// //             if (memcmp(file_content + i, current_virus->sig, current_virus->SigSize) == 0)
+// //             {
+// //                 printf("Virus detected: %s at position %d\n", current_virus->virusName, i);
+// //                 virus_count++;
+// //             }
+// //         }
+// //         current = current->nextVirus;
+// //     }
+
+// //     if (virus_count == 0)
+// //     {
+// //         printf("No viruses detected in the file.\n");
+// //     }
+
+// //     free(file_content);
+// //     return virus_list;
+// // }
+
+void detect_virus(char *buffer, unsigned int size, link *virus_list)
 {
-    return NULL;
+    if (buffer == NULL || virus_list == NULL || size == 0)
+    {
+        printf("Invalid buffer or virus list\n");
+        return;
+    }
+
+    // Traverse through the virus list and compare with file content
+    link *current = virus_list;
+    while (current != NULL)
+    {
+        virus *current_virus = current->vir;
+        unsigned short signature_size = current_virus->SigSize;
+
+        // Compare the virus signature with the buffer content
+        for (int i = 0; i <= size - signature_size; i++)
+        {
+            if (memcmp(buffer + i, current_virus->sig, signature_size) == 0)
+            {
+                printf("Virus detected:\n");
+                printf("Start byte location: %d\n", i);
+                printf("Virus name: %s\n", current_virus->virusName);
+                printf("Signature size: %hu\n", current_virus->SigSize);
+            }
+        }
+
+        current = current->nextVirus;
+    }
 }
-link *fix_file(link *virus_list)
+
+link *detect_viruses(link *virus_list, char* file_name)
+{
+    const int BUFFER_SIZE = 10240; // 10K bytes buffer size
+    char buffer[BUFFER_SIZE];
+
+    // Open the file indicated by the command-line argument FILE
+    FILE *file = fopen(file_name, "rb");
+    if (file == NULL)
+    {
+        perror("Error opening file");
+        return virus_list;
+    }
+
+    // fread() the entire contents of the suspected file into the buffer
+    size_t bytes_read = fread(buffer, 1, BUFFER_SIZE, file);
+    fclose(file);
+
+    // Scan the content of the buffer to detect viruses
+    detect_virus(buffer, (unsigned int)bytes_read, virus_list);
+
+    return virus_list;
+}
+
+link *fix_file(link *virus_list,char* file_name)
 {
     return NULL;
 }
@@ -246,6 +327,19 @@ link *fix_file(link *virus_list)
 // Main function
 int main(int argc, char **argv)
 {
+
+    // Open the suspected file
+    char *suspected_file = argv[1];
+    if (suspected_file == NULL)
+    {
+        perror("Error opening suspected file");
+        return EXIT_FAILURE;
+    }
+
+    // Allocate a buffer to hold the contents of the suspected file
+   
+
+    //***********************************************************
     // Initialize virus list
     link *virus_list = NULL;
 
@@ -283,7 +377,14 @@ int main(int argc, char **argv)
         // Execute the selected function
         if (menu[choice - 1].fun != NULL)
         {
-            virus_list = menu[choice - 1].fun(virus_list);
+            if (choice != 3)
+            {
+                virus_list = menu[choice - 1].fun(virus_list,suspected_file);
+            }
+            else
+            {
+                detect_viruses(virus_list,suspected_file);
+            }
         }
         else
         {
