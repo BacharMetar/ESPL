@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <string.h> // Include string.h for strlen function
+#include <string.h> 
 
 int main()
 {
@@ -24,28 +24,14 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    // if (pid == 0)
-    // { // Child process
-    //     // Write a message to the parent
-    //     write(pipe_fd[1], "hello", 5);
-
-    //     close(pipe_fd[1]); // Close the write end
-    // }
     if (pid == 0)
-  { 
-    // Child process
-    // Close the read end of the pipe as it won't be used in the child process
-    // Get input from the user
-    char user_input[2048];
-    printf("Enter a message: ");
-    fgets(user_input, sizeof(user_input), stdin);
+    { // Child process
+        // Write a message to the parent
+        write(pipe_fd[1], "hello", 5);
 
-    // Write the user input to the pipe
-    write(pipe_fd[1], user_input, strlen(user_input));
-
-    // Close the write end of the pipe
-    close(pipe_fd[1]); 
-  }
+        close(pipe_fd[1]); // Close the write end
+    }
+   
 
 
     if (pid == 0)
@@ -72,3 +58,6 @@ int main()
 
     return 0;
 }
+
+
+

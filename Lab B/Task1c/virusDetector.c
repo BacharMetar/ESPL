@@ -148,12 +148,12 @@ struct fun_desc
 };
 
 // Function prototypes
-link *load_signatures(link *virus_list,char* file_name);
-link *print_signatures(link *virus_list,char* file_name);
-link *detect_viruses(link *virus_list, char* file_name);
-link *fix_file(link *virus_list,char* file_name);
+link *load_signatures(link *virus_list, char *file_name);
+link *print_signatures(link *virus_list, char *file_name);
+link *detect_viruses(link *virus_list, char *file_name);
+link *fix_file(link *virus_list, char *file_name);
 
-link *load_signatures(link *virus_list,char* file_name)
+link *load_signatures(link *virus_list, char *file_name)
 {
     const int BUFFER_SIZE = 128;
     char filename[BUFFER_SIZE];
@@ -202,7 +202,7 @@ link *load_signatures(link *virus_list,char* file_name)
     return virus_list;
 }
 
-link *print_signatures(link *virus_list,char* file_name)
+link *print_signatures(link *virus_list, char *file_name)
 {
     list_print(virus_list, stdout);
     return virus_list;
@@ -265,6 +265,58 @@ link *print_signatures(link *virus_list,char* file_name)
 // //     return virus_list;
 // // }
 
+int get_file_size(FILE *file)
+{
+    fseek(file, 0, SEEK_END);
+    int size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    return size;
+}
+int minimum(int a, int b)
+{
+    if (a < b)
+    {
+        return a;
+    }
+
+    else
+    {
+        return b;
+    }
+}
+
+// void detect_virus(char *buffer, unsigned int size, link *virus_list)
+// {
+//     if (buffer == NULL || virus_list == NULL || size == 0)
+//     {
+//         printf("Invalid buffer or virus list\n");
+//         return;
+//     }
+
+//     // Traverse through the virus list and compare with file content
+//     link *current = virus_list;
+//     while (current != NULL)
+//     {
+//         virus *current_virus = current->vir;
+//         unsigned short signature_size = current_virus->SigSize;
+
+//         // Compare the virus signature with the buffer content
+//         for (int i = 0; i <= size - signature_size; i++)
+//         {
+//             if (memcmp(buffer + i, current_virus->sig, signature_size) == 0)
+//             {
+//                 printf("Virus detected:\n");
+//                 printf("Start byte location: %d\n", i);
+//                 printf("Virus name: %s\n", current_virus->virusName);
+//                 printf("Signature size: %hu\n", current_virus->SigSize);
+//             }
+//         }
+
+//         current = current->nextVirus;
+//     }
+// }
+
 void detect_virus(char *buffer, unsigned int size, link *virus_list)
 {
     if (buffer == NULL || virus_list == NULL || size == 0)
@@ -283,6 +335,12 @@ void detect_virus(char *buffer, unsigned int size, link *virus_list)
         // Compare the virus signature with the buffer content
         for (int i = 0; i <= size - signature_size; i++)
         {
+            // Check if the remaining size of the buffer is less than the signature size
+            if (size - i < signature_size)
+            {
+                break; // Stop iterating if the remaining buffer size is insufficient for the signature
+            }
+
             if (memcmp(buffer + i, current_virus->sig, signature_size) == 0)
             {
                 printf("Virus detected:\n");
@@ -296,7 +354,7 @@ void detect_virus(char *buffer, unsigned int size, link *virus_list)
     }
 }
 
-link *detect_viruses(link *virus_list, char* file_name)
+link *detect_viruses(link *virus_list, char *file_name)
 {
     const int BUFFER_SIZE = 10240; // 10K bytes buffer size
     char buffer[BUFFER_SIZE];
@@ -308,18 +366,18 @@ link *detect_viruses(link *virus_list, char* file_name)
         perror("Error opening file");
         return virus_list;
     }
-
+    const int FILE_SIZE = get_file_size(file);
     // fread() the entire contents of the suspected file into the buffer
-    size_t bytes_read = fread(buffer, 1, BUFFER_SIZE, file);
+    /* size_t bytes_read = */ fread(buffer, 1, minimum(BUFFER_SIZE, FILE_SIZE), file);
     fclose(file);
 
     // Scan the content of the buffer to detect viruses
-    detect_virus(buffer, (unsigned int)bytes_read, virus_list);
+    detect_virus(buffer, minimum(BUFFER_SIZE, FILE_SIZE), virus_list);
 
     return virus_list;
 }
 
-link *fix_file(link *virus_list,char* file_name)
+link *fix_file(link *virus_list, char *file_name)
 {
     return NULL;
 }
@@ -337,7 +395,6 @@ int main(int argc, char **argv)
     }
 
     // Allocate a buffer to hold the contents of the suspected file
-   
 
     //***********************************************************
     // Initialize virus list
@@ -379,11 +436,11 @@ int main(int argc, char **argv)
         {
             if (choice != 3)
             {
-                virus_list = menu[choice - 1].fun(virus_list,suspected_file);
+                virus_list = menu[choice - 1].fun(virus_list, suspected_file);
             }
             else
             {
-                detect_viruses(virus_list,suspected_file);
+                detect_viruses(virus_list, suspected_file);
             }
         }
         else

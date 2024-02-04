@@ -253,7 +253,12 @@ int main(int argc, char **argv)
 {
     link* list = NULL;
 
-    menu options_menu[] = {{"Load Signatures", load_signature},{"Print signatures", print_signature}, {"Detect viruses", detect_viruses},{"Fix file", fix_file},{"Quit", quit},{NULL, NULL}};
+    menu options_menu[] = {{"Load Signatures", load_signature},
+                            {"Print signatures", print_signature}, 
+                            {"Detect viruses", detect_viruses},
+                            {"Fix file", fix_file},
+                            {"Quit", quit},
+                            {NULL, NULL}};
 
     const int MENU_LENGTH = sizeof(options_menu) / (sizeof(menu)) - 1;
     int option;
