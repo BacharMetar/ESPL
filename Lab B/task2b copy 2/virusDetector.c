@@ -2,13 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#define MAX_VIRUSES 100
-int numViruses = 0;
-// Global array to store the start byte of each virus
-long startBytes[MAX_VIRUSES] = {0};
+
 // Global variable to indicate if the file format is big endian (VIRB)
 int isVIRB = 0;
-
 typedef struct virus
 {
     unsigned short SigSize;
@@ -53,6 +49,7 @@ virus *readVirus(FILE *input)
 
     return new_virus;
 }
+
 
 void printVirus(virus *virus, FILE *output)
 {
@@ -144,6 +141,13 @@ void list_free(link *virus_list)
     }
 }
 
+// Define the function descriptor struct
+// struct fun_desc
+// {
+//     char *name;
+//     link *(*fun)(link *);
+// };
+
 struct fun_desc
 {
     char *name;
@@ -232,10 +236,101 @@ link *print_signatures(link *virus_list, char *file_name)
     list_print(virus_list, stdout);
     return virus_list;
 }
+//--------------------------------------------------------------------------------
+// void detect_virus(char *buffer, unsigned int size, link *virus_list)
+// {
+//     if (buffer == NULL || virus_list == NULL || size == 0)
+//     {
+//         printf("Invalid buffer or virus list\n");
+//         return;
+//     }
 
+//     // Traverse through the virus list and compare with file content
+//     link *current = virus_list;
+//     while (current != NULL)
+//     {
+//         virus *current_virus = current->vir;
+//         unsigned short signature_size = current_virus->SigSize;
+
+//         // Compare the virus signature with the buffer content
+//         for (int i = 0; i <= size - signature_size; i++)
+//         {
+//             if (memcmp(buffer + i, current_virus->sig, signature_size) == 0)
+//             {
+//                 printf("Virus detected:\n");
+//                 printf("Start byte location: %d\n", i);
+//                 printf("Virus name: %s\n", current_virus->virusName);
+//                 printf("Signature size: %hu\n", current_virus->SigSize);
+//             }
+//         }
+
+//         current = current->nextVirus;
+//     }
+// }
+
+// link *detect_viruses(link *virus_list, char *file_name)
+// {
+//     const int BUFFER_SIZE = 10240; // 10K bytes buffer size
+//     char buffer[BUFFER_SIZE];
+
+//     // Open the file indicated by the command-line argument FILE
+//     FILE *file = fopen(file_name, "rb");
+//     if (file == NULL)
+//     {
+//         perror("Error opening file");
+//         return virus_list;
+//     }
+
+//     // fread() the entire contents of the suspected file into the buffer
+//     size_t bytes_read = fread(buffer, 1, BUFFER_SIZE, file);
+//     fclose(file);
+
+//     // Scan the content of the buffer to detect viruses
+//     detect_virus(buffer, (unsigned int)bytes_read, virus_list);
+
+//     return virus_list;
+// }
+
+// link *fix_file(link *virus_list, char *file_name) {
+//     if (virus_list == NULL || file_name == NULL) {
+//         printf("Invalid virus list or file name\n");
+//         return virus_list;
+//     }
+
+//     FILE *file = fopen(file_name, "rb+");
+//     if (file == NULL) {
+//         perror("Error opening suspected file");
+//         return virus_list;
+//     }
+
+//     // Prompt the user for the starting byte location
+//     int start_byte;
+//     printf("Enter the starting byte location of the virus: ");
+//     scanf("%d", &start_byte);
+
+//     // Prompt the user for the signature size
+//     unsigned short signature_size;
+//     printf("Enter the signature size of the virus: ");
+//     scanf("%hu", &signature_size);
+
+//     // Move to the location of the virus in the file
+//     fseek(file, start_byte, SEEK_SET);
+
+//     // Neutralize the virus by writing the RET instruction (0xC3)
+//     unsigned char retInstruction = 0xC3;
+//     for (int i = 0; i < signature_size; ++i) {
+//         fwrite(&retInstruction, sizeof(unsigned char), 1, file);
+//     }
+
+//     fclose(file);
+//     printf("Virus at byte %d with signature size %hu has been fixed.\n", start_byte, signature_size);
+//     return virus_list;
+// }
+
+//--------------------------------------------------------------------------------
 int minimum(int a, int b)
 {
-    if (a < b)
+    if(a < b)
     {
         return a;
     }
@@ -245,7 +340,7 @@ int minimum(int a, int b)
         return b;
     }
 }
-int get_file_size(FILE *file)
+int get_file_size(FILE* file)
 {
     fseek(file, 0, SEEK_END);
     int size = ftell(file);
@@ -283,11 +378,6 @@ void detect_virus(char *buffer, unsigned int size, link *virus_list)
                 printf("Start byte location: %d\n", i);
                 printf("Virus name: %s\n", current_virus->virusName);
                 printf("Signature size: %hu\n", current_virus->SigSize);
-
-                // Store the start byte of the virus
-
-                startBytes[numViruses] = i;
-                numViruses++;
             }
         }
 
@@ -317,9 +407,8 @@ link *detect_viruses(link *virus_list, char *file_name)
 
     return virus_list;
 }
-
 // Define a global variable to store the signature size
-short signatureSize = 0;
+short signitureSize = 0;
 
 void neutralize_virus(char *fileName, int signatureOffset)
 {
@@ -331,16 +420,20 @@ void neutralize_virus(char *fileName, int signatureOffset)
     }
 
     // Move the file pointer to the location of the virus signature offset
-    fseek(file, startBytes[signatureSize], SEEK_SET);
+    fseek(file, signatureOffset, SEEK_SET);
 
-    // Write zeros to neutralize the virus signature
-    unsigned char buffer[signatureSize];
-    for (int i = 0; i < signatureSize; i++)
+    // Write the RET instruction to the first byte of the virus signature
+    // unsigned char ret_instruction = 0xC3; // RET instruction in x86 assembly
+    // fwrite(&ret_instruction, sizeof(unsigned char), 1, file);
+
+    // fclose(file);
+    char buffer[signitureSize];
+    for (int i = 0; i < signitureSize; i++)
     {
         buffer[i] = 0;
     }
 
-    fwrite(buffer, 1, signatureSize, file);
+    fwrite(buffer, 1, signitureSize, file);
 
     fclose(file);
 }
@@ -348,21 +441,26 @@ void neutralize_virus(char *fileName, int signatureOffset)
 link *fix_file(link *virus_list, char *file_name)
 {
     // Open the suspected file
-    FILE *file = fopen(file_name, "r+b");
+    FILE *file = fopen(file_name, "rb");
     if (file == NULL)
     {
         perror("Error opening file");
         return virus_list;
     }
+    long startByte = 0; // Initialize the start byte
 
     // Iterate through the linked list of viruses
     link *current = virus_list;
-    int i = 0;
-    while (current != NULL && i < numViruses)
+    while (current != NULL)
     {
+        fseek(file, startByte, SEEK_SET);
         // Neutralize the virus by calling neutralize_virus function
-        neutralize_virus(file_name, startBytes[i]);
-        i++;
+        signitureSize = current->vir->SigSize;
+        neutralize_virus(file_name, startByte);
+
+        // Move to the next virus
+        startByte += current->vir->SigSize;
+
         current = current->nextVirus;
     }
 
