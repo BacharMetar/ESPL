@@ -2,12 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#define MAX_VIRUSES 100
-int numViruses = 0;
-// Global array to store the start byte of each virus
-long startBytes[MAX_VIRUSES] = {0};
+
 // Global variable to indicate if the file format is big endian (VIRB)
 int isVIRB = 0;
+// Define a global variable to store the signature size
+short signitureSize = 0;
 
 typedef struct virus
 {
@@ -21,6 +20,18 @@ typedef struct link
     struct link *nextVirus;
     virus *vir;
 } link;
+
+struct fun_desc
+{
+    char *name;
+    link *(*fun)(link *, char *); // Update the function signature
+}fun_desc;
+
+// Function prototypes
+link *load_signatures(link *virus_list, char *file_name);
+link *print_signatures(link *virus_list, char *file_name);
+link *detect_viruses(link *virus_list, char *file_name);
+link *fix_file(link *virus_list, char *file_name);
 
 virus *readVirus(FILE *input)
 {
@@ -144,17 +155,6 @@ void list_free(link *virus_list)
     }
 }
 
-struct fun_desc
-{
-    char *name;
-    link *(*fun)(link *, char *); // Update the function signature
-};
-
-// Function prototypes
-link *load_signatures(link *virus_list, char *file_name);
-link *print_signatures(link *virus_list, char *file_name);
-link *detect_viruses(link *virus_list, char *file_name);
-link *fix_file(link *virus_list, char *file_name);
 
 link *load_signatures(link *virus_list, char *file_name)
 {
@@ -194,7 +194,7 @@ link *load_signatures(link *virus_list, char *file_name)
         fclose(file);
         exit(EXIT_FAILURE);
     }
-     // Set the global variable isVIRB based on the magic number
+    // Set the global variable isVIRB based on the magic number
     if (strcmp(magic_number, "VIRB") == 0)
     {
         isVIRB = 1;
@@ -204,12 +204,10 @@ link *load_signatures(link *virus_list, char *file_name)
         isVIRB = 0;
     }
     // rewind(file);
+
     // Read viruses from the file and append them to the virus list
     while (ftell(file) < FILE_SIZE)
     {
-        // long currentPosition = ftell(file);
-        // printf("Current file position before readVirus: %ld\n", currentPosition);
-
         virus *new_virus = readVirus(file);
         if (new_virus == NULL)
         {
@@ -218,12 +216,9 @@ link *load_signatures(link *virus_list, char *file_name)
             exit(EXIT_FAILURE);
         }
         virus_list = list_append(virus_list, new_virus);
-        // currentPosition = ftell(file);
-        // printf("Current file position after readVirus: %ld\n", currentPosition);
     }
 
     fclose(file);
-
     return virus_list;
 }
 
@@ -260,6 +255,7 @@ void detect_virus(char *buffer, unsigned int size, link *virus_list)
         printf("Invalid buffer or virus list\n");
         return;
     }
+    int virusesDetected = 0; // Variable to track if any viruses were detected
 
     // Traverse through the virus list and compare with file content
     link *current = virus_list;
@@ -283,15 +279,16 @@ void detect_virus(char *buffer, unsigned int size, link *virus_list)
                 printf("Start byte location: %d\n", i);
                 printf("Virus name: %s\n", current_virus->virusName);
                 printf("Signature size: %hu\n", current_virus->SigSize);
-
-                // Store the start byte of the virus
-
-                startBytes[numViruses] = i;
-                numViruses++;
+                virusesDetected = 1;
             }
         }
 
         current = current->nextVirus;
+    }
+    // If no viruses were detected, print a message
+    if (!virusesDetected)
+    {
+        printf("No viruses detected in the file.\n");
     }
 }
 
@@ -318,8 +315,6 @@ link *detect_viruses(link *virus_list, char *file_name)
     return virus_list;
 }
 
-// Define a global variable to store the signature size
-short signatureSize = 0;
 
 void neutralize_virus(char *fileName, int signatureOffset)
 {
@@ -331,16 +326,19 @@ void neutralize_virus(char *fileName, int signatureOffset)
     }
 
     // Move the file pointer to the location of the virus signature offset
-    fseek(file, startBytes[signatureSize], SEEK_SET);
+    fseek(file, signatureOffset, SEEK_SET);
 
-    // Write zeros to neutralize the virus signature
-    unsigned char buffer[signatureSize];
-    for (int i = 0; i < signatureSize; i++)
-    {
-        buffer[i] = 0;
-    }
+    // char buffer[signitureSize];
+    // for (int i = 0; i < signitureSize; i++)
+    // {
+    //     buffer[i] = 0;
+    // }
 
-    fwrite(buffer, 1, signatureSize, file);
+    // fwrite(buffer, 1, signitureSize, file);
+
+    // Write the RET instruction (0xC3) to the first byte of the virus signature
+    unsigned char ret_instruction = 0xC3;
+    fwrite(&ret_instruction, sizeof(unsigned char), 1, file);
 
     fclose(file);
 }
@@ -348,21 +346,26 @@ void neutralize_virus(char *fileName, int signatureOffset)
 link *fix_file(link *virus_list, char *file_name)
 {
     // Open the suspected file
-    FILE *file = fopen(file_name, "r+b");
+    FILE *file = fopen(file_name, "rb");
     if (file == NULL)
     {
         perror("Error opening file");
         return virus_list;
     }
+    long startByte = 0; // Initialize the start byte
 
     // Iterate through the linked list of viruses
     link *current = virus_list;
-    int i = 0;
-    while (current != NULL && i < numViruses)
+    while (current != NULL)
     {
+        fseek(file, startByte, SEEK_SET);
         // Neutralize the virus by calling neutralize_virus function
-        neutralize_virus(file_name, startBytes[i]);
-        i++;
+        signitureSize = current->vir->SigSize;
+        neutralize_virus(file_name, startByte);
+
+        // Move to the next virus
+        startByte += current->vir->SigSize;
+
         current = current->nextVirus;
     }
 
@@ -422,14 +425,15 @@ int main(int argc, char **argv)
         // Execute the selected function
         if (menu[choice - 1].fun != NULL)
         {
-            if (choice != 3)
-            {
-                virus_list = menu[choice - 1].fun(virus_list, suspected_file);
-            }
-            else
-            {
-                detect_viruses(virus_list, suspected_file);
-            }
+            // if (choice != 3)
+            // {
+            //     virus_list = menu[choice - 1].fun(virus_list, suspected_file);
+            // }
+            // else
+            // {
+            //     detect_viruses(virus_list, suspected_file);
+            // }
+             virus_list = menu[choice - 1].fun(virus_list, suspected_file);
         }
         else
         {
@@ -439,7 +443,7 @@ int main(int argc, char **argv)
     }
 
     // Free memory before exiting
-    // Add code to free virus_list
+    list_free(virus_list);
 
     return 0;
 }
