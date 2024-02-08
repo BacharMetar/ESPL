@@ -25,7 +25,7 @@ struct fun_desc
 {
     char *name;
     link *(*fun)(link *, char *); // Update the function signature
-}fun_desc;
+} fun_desc;
 
 // Function prototypes
 link *load_signatures(link *virus_list, char *file_name);
@@ -154,7 +154,6 @@ void list_free(link *virus_list)
         free(current);
     }
 }
-
 
 link *load_signatures(link *virus_list, char *file_name)
 {
@@ -306,6 +305,7 @@ link *detect_viruses(link *virus_list, char *file_name)
     }
     const int FILE_SIZE = get_file_size(file);
     // fread() the entire contents of the suspected file into the buffer
+    // size should be the minimum between the size of the buffer and the size of the suspected file
     /* size_t bytes_read = */ fread(buffer, 1, minimum(BUFFER_SIZE, FILE_SIZE), file);
     fclose(file);
 
@@ -314,7 +314,6 @@ link *detect_viruses(link *virus_list, char *file_name)
 
     return virus_list;
 }
-
 
 void neutralize_virus(char *fileName, int signatureOffset)
 {
@@ -327,15 +326,7 @@ void neutralize_virus(char *fileName, int signatureOffset)
 
     // Move the file pointer to the location of the virus signature offset
     fseek(file, signatureOffset, SEEK_SET);
-
-    // char buffer[signitureSize];
-    // for (int i = 0; i < signitureSize; i++)
-    // {
-    //     buffer[i] = 0;
-    // }
-
-    // fwrite(buffer, 1, signitureSize, file);
-
+    ;
     // Write the RET instruction (0xC3) to the first byte of the virus signature
     unsigned char ret_instruction = 0xC3;
     fwrite(&ret_instruction, sizeof(unsigned char), 1, file);
@@ -384,10 +375,6 @@ int main(int argc, char **argv)
         perror("Error opening suspected file");
         return EXIT_FAILURE;
     }
-
-    // Allocate a buffer to hold the contents of the suspected file
-
-    //***********************************************************
     // Initialize virus list
     link *virus_list = NULL;
 
@@ -433,7 +420,7 @@ int main(int argc, char **argv)
             // {
             //     detect_viruses(virus_list, suspected_file);
             // }
-             virus_list = menu[choice - 1].fun(virus_list, suspected_file);
+            virus_list = menu[choice - 1].fun(virus_list, suspected_file);
         }
         else
         {
