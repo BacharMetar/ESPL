@@ -18,13 +18,16 @@ _start:
     mov     edi, dword [esp + 4]   ; edi = argc
     mov     esi, dword [esp + 8]   ; esi = argv
 
+    ; Skip the first argument (program name)
+    add     esi, 8                 ; Move to argv[1]
+
+
 print_arguments:   
-    cmp     edi, 0                 ; Check if all argv are read
+    cmp     edi, 1                 ; Check if all argv are read (excluding the program name)
     jz      call_exit
 
     mov     ecx, esi
     call    my_strlen              ; Get the length of the argument
-
 print_argument_loop:
     cmp     byte [ecx], 0          ; Check for null terminator
     jz      print_newline          ; If end of argument, print newline and proceed to next argument
