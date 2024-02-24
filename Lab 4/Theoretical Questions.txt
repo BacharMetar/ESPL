@@ -1,0 +1,74 @@
+Task 0a:
+1. The entry point of the ELF file is located in its ELF header.
+2. There are 29 sections in the 'abc' file (it says 29 section headers when running readelf -h abc)
+
+Task 1c:
+- Depending on the chosen unit size, the printed hexadecimal values may differ in order when compared with the output of hexedit. Why is that?
+That's because of the endian-ness of the integer variable in C (default: little-endian, so flipped bytes)
+
+- What is the entry point of your own hexeditplus program?
+The entry point of the ELF file is located in address 0x18 after the 16 bytes of magic number and 6 bytes of other header data
+It shows 10 and then 13 which means the entry address is 0x1310 (because it's little endian)
+
+Task 2:
+- Which function precedes main in execution ? (Hint: see assembly code in Lab 3)
+the _start function should proceed the main function in execution
+
+- What is the virtual address to which this function is loaded (Hint: use readelf -s)
+The virtual address of the _start function in the 'deep_thought' ELF file is: 0x08048156
+
+Task 2 - Fixing the buggy executable file:
+We need to update the current entry point which seems to be: 0x804816c (a different address from the _start function for some reason)
+
+- What are the values of location/length? How do you know that?
+The value of location is 18 hex (24 decimal) - because the entry point is located in address number 0x18 in the ELF header
+The value of length is 4 because the address value is 4 bytes long: 0x08048156
+
+So we edited these 4 bytes and now after executing it, it prints:
+Answer to Life, the Universe, and Everything
+42
+
+Task 3:
+1. find the offset (file location) of the function main:
+	.text: address: 08048320. offset: 000320. size: 000192
+	main: address: 0804841d -> offset from .text = .text_address - main_address = 0804841d - 08048320 = 0xfd
+	-> offset from beginning of file: .text_offset + offset_from_.text = 000320 + 0xfd = 0x41d (the last 3 bytes of the original hex address)
+2. find the size of the function main: 23
+3. use your hexeditplus program to display the content of that function on the screen.
+55 89 E5 83 E4 F0 83 EC 10 C7 04 24 D0 84 04 08 E8 BE FE FF FF C9 C3
+
+After disassembly:
+0:  55                      push   ebp
+1:  89 e5                   mov    ebp,esp
+3:  83 e4 f0                and    esp,0xfffffff0
+6:  83 ec 10                sub    esp,0x10
+9:  c7 04 24 d0 84 04 08    mov    DWORD PTR [esp],0x80484d0
+10: e8 be fe ff ff          call   0xfffffed3
+15: c9                      leave
+16: c3                      ret
+
+After decompilation, should be something like:
+#include <stdio.h>
+int main() {
+    const char* str = "Your string here"; // Replace with the actual string at 0x80484d0
+    printf("%s", str);
+    return 0;
+}
+
+Task 3 - Hacking the executable file:
+Let's edit the first byte to be ret (0xc3)
+Now it simply runs but instantly returns.
+We could've also returned only at byte number 3 to make sure the stack pointers are kept the same, or could also switch all bytes to be NOP (0x90) instruction.
+
+Task 4:
+The problem is that the function digit_cnt does not count the '0' and the '9' digits, only digits in between
+The offset for the digit_cnt function in 'ntsc': 0x00000577, the size of it: 1136
+The offset for the new digit_count function in 'ntsc_correct': 0x000011ed, the size of it: 62
+
+- (think: are there any kinds of restrictions on the code you wrote for the digit_cnt function?)
+Yes, the restrictions are the size of the function (should be at most the size of digit_cnt, fortunately it is 62 < 1136),
+and no usage of extra functions, only simple code that is translatable to machine code to swap the implementation
+
+Explain how you did it, and show that it works.
+We inserted the 62 bytes located in 0x000011ed of file 'ntsc_correct' into the 0x00000577 location in file 'ntsc', this swaps the implemenation of digit_cnt with the new implementation of digit_count in the new file.
+

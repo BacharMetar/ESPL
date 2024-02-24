@@ -1,0 +1,8 @@
+0:  55                      push   ebp
+1:  89 e5                   mov    ebp,esp
+3:  83 e4 f0                and    esp,0xfffffff0
+6:  83 ec 10                sub    esp,0x10
+9:  c7 04 24 d0 84 04 08    mov    DWORD PTR [esp],0x80484d0
+10: e8 be fe ff ff          call   0xfffffed3
+15: c9                      leave
+16: c3                      ret
