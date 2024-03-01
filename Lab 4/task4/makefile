@@ -14,4 +14,4 @@ task4.o: task4.c
 
 .PHONY: clean
 clean:
-	rm -f *.o hexeditplus
+	rm -f *.o hexeditplus ntsc_correct

@@ -4,7 +4,8 @@
         "stdio.h": "c",
         "stdlib.h": "c",
         "virusdetector": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "unistd.h": "c"
     },
     "workbench.colorCustomizations": {
         "activityBar.activeBackground": "#3399ff",
