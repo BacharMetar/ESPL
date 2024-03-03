@@ -191,6 +191,13 @@ int main(int argc, char const **argv)
     printf("Type\t\tOffset\t\tVirtAddr\tPhysAddr\tFileSiz\tMemSiz\tFlg\tAlign\tprotection\tmapping\n");   
     foreach_phdr(map_start, load_phdr, file_descriptor);
     printf("\n");
+    char input;
+    while (1) {
+        scanf("%c", &input);
+        if (input == '0') {
+            break; // Exit the loop and terminate the program
+        }
+    }
 
     if(munmap(map_start, file_descriptor_stat.st_size) == -1) 
     {
