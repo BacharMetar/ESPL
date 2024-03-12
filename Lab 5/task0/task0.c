@@ -14,10 +14,10 @@ void print_program_header(Elf32_Phdr *phdr, int index) {
 
 int foreach_phdr(void *map_start, void (*func)(Elf32_Phdr *, int), int arg) {
     Elf32_Ehdr *ehdr = (Elf32_Ehdr *)map_start;
-    Elf32_Phdr *phdr = (Elf32_Phdr *)(map_start + ehdr->e_phoff);//calculates the starting address of the program header
+    Elf32_Phdr *phdr = (Elf32_Phdr *)((char *)map_start + ehdr->e_phoff);
 
     for (int i = 0; i < ehdr->e_phnum; ++i) {
-        func(&phdr[i], i);
+        func(&phdr[i], arg);
     }
 
     return 0;

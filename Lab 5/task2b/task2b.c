@@ -87,15 +87,11 @@ void load_phdr(Elf32_Phdr *phdr, int fd) {
             exit(EXIT_FAILURE);
         }
         // Align the offset and virtual address to page boundaries
-        // off_t offset = phdr->p_offset & ~(page_size - 1);
-        // off_t vaddr = phdr->p_vaddr & ~(page_size - 1);
-
         off_t offset = phdr->p_offset / page_size * page_size;
         off_t vaddr = phdr->p_vaddr / page_size * page_size;
-        // off_t vaddr = phdr->p_vaddr;
+
         size_t padding = phdr->p_vaddr - vaddr; // Calculate padding
         // Map the segment into memory
-        // void *mapped_segment = mmap((void *)vaddr, phdr->p_memsz + padding, prot, MAP_PRIVATE | MAP_FIXED, fd, offset);
         void *mapped_segment = mmap((void *)vaddr, phdr->p_memsz + padding , prot, MAP_PRIVATE | MAP_FIXED, fd, offset);
 
 
@@ -109,48 +105,6 @@ void load_phdr(Elf32_Phdr *phdr, int fd) {
 }
 
 
-
-
-
-// int main(int argc, char *argv[]) {
-//     if (argc != 2) {
-//         fprintf(stderr, "Usage: %s <executable>\n", argv[0]);
-//         exit(EXIT_FAILURE);
-//     }
-
-//     int fd = open(argv[1], O_RDONLY);
-//     if (fd == -1) {
-//         perror("open");
-//         exit(EXIT_FAILURE);
-//     }
-
-//     struct stat st;
-//     if (fstat(fd, &st) == -1) {
-//         perror("fstat");
-//         exit(EXIT_FAILURE);
-//     }
-
-//     void *map_start = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-//     if (map_start == MAP_FAILED) {
-//         perror("mmap");
-//         exit(EXIT_FAILURE);
-//     }
-
-//     printf("Type      Offset     VirtAddr   PhysAddr   FileSiz  MemSiz    Flg     Align    Protection    Mapping\n");
-//     // foreach_phdr(map_start, print_program_header_info, 0);
-    
-//     // Call load_phdr for each program header
-//     foreach_phdr(map_start, load_phdr, fd);
-    
-//     if (munmap(map_start, st.st_size) == -1) {
-//         perror("munmap");
-//         exit(EXIT_FAILURE);
-//     }
-
-//     close(fd);
-
-//     return 0;
-// }
 int main(int argc, char *argv[]) {
     printf("My PID is: %d\n", getpid());
     if (argc != 2) {
@@ -181,7 +135,9 @@ int main(int argc, char *argv[]) {
     // Call load_phdr for each program header
     foreach_phdr(map_start, load_phdr, fd);
     
-    // a while loop to test the mmap funciton . using ps aux | grep <program_name> to get the pid and pmap <pid> to show information about the memory mappings of our program
+    // a while loop to test the mmap funciton . 
+    //using ps aux | grep <program_name> to get the pid and
+    // pmap <pid> to show information about the memory mappings of our program
     char input;
     while (1) {
         scanf("%c", &input);
