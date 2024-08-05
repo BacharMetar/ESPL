@@ -1,6 +1,6 @@
 # ESPL Labs: Tasks 1-5 (A-C, E)
 
-Welcome to the ESPL Labs repository. This repository contains code and documentation for a series of labs designed to enhance your understanding of C programming, memory management, debugging, and Unix/Linux system calls.
+Welcome to the ESPL Labs repository. This repository contains code and documentation for a series of labs designed to enhance understanding of C programming, memory management, debugging, and Unix/Linux system calls.
 
 ## Lab 1: Program Memory and Pointers, Debugging, and Simulating Object-Oriented Programming
 
